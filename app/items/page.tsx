@@ -1,5 +1,3 @@
-"use client";
-import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Sidebar from "@/components/Sidebar";
 import Link from "next/link";
@@ -12,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/Molecules/card";
+import { buttonVariants } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import {
 import { LinkIcon } from "lucide-react";
 import axios from "axios"; // Import Axios for API calls
 import Image from "next/image";
+import { getAccessToken } from "@auth0/nextjs-auth0";
 
 type ItemType = {
   _id: string;
@@ -38,32 +39,19 @@ type ItemType = {
   }[];
 };
 
-const Items = () => {
-  const [items, setItems] = useState<ItemType[]>([]); // State to store items data
-
+const Items = async () => {
   // Function to fetch items data from API
-  const fetchItems = async () => {
-    try {
-      const response = await axios.get<ItemType[]>(
-        "http://localhost:3333/items"
-      );
-      console.log("Items", response.data);
+  let items: any[] = [];
+  const token = await getAccessToken();
 
-      const itemsWithCategory = await Promise.all(
-        response.data.map(async (item) => {
-          const categoryName = await getCategoryName(item.categoryId);
-          return { ...item, category: categoryName };
-        })
-      );
-      setItems(itemsWithCategory); // Set the fetched items data to state
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchItems(); // Fetch items data when component mounts
-  }, []);
+  console.log("Items", token);
+  const data: any = await axios.get<ItemType[]>("http://localhost:3333/items", {
+    headers: {
+      Authorization: `Bearer ${token.accessToken}`,
+    },
+  });
+  items = data.data;
+  console.log("Items", items);
 
   // Function to handle item update onClick
   const handleUpdate = (itemId: string) => {
@@ -144,10 +132,12 @@ const Items = () => {
                             </TableCell>
                             <TableCell className="text-center">
                               {item.images && item.images.length > 0 && (
-                                <img
+                                <Image
                                   src={item.images[0]}
                                   alt="Item Image"
-                                  className="h-20 w-20"
+                                  className="w-25 h-20"
+                                  width={100}
+                                  height={80}
                                 />
                               )}
                             </TableCell>
@@ -164,12 +154,14 @@ const Items = () => {
                               {item.variants[2].quantity}
                             </TableCell>
                             <TableCell className="text-center">
-                              <Button
-                                variant="outline"
-                                onClick={() => handleUpdate(item._id)}
+                              <Link
+                                className={buttonVariants({
+                                  variant: "outline",
+                                })}
+                                href={`items/update/${item._id}`}
                               >
                                 Update
-                              </Button>
+                              </Link>
                             </TableCell>
                           </TableRow>
                         );
