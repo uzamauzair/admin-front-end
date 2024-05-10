@@ -1,4 +1,3 @@
-import Head from "next/head";
 import Sidebar from "@/components/Sidebar";
 import Link from "next/link";
 import { MdAdd } from "react-icons/md";
@@ -20,10 +19,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/Molecules/table";
-import { LinkIcon } from "lucide-react";
 import axios from "axios"; // Import Axios for API calls
 import Image from "next/image";
 import { getAccessToken } from "@auth0/nextjs-auth0";
+import Head from "next/head";
 
 type ItemType = {
   _id: string;
@@ -40,37 +39,41 @@ type ItemType = {
 };
 
 const Items = async () => {
-  // Function to fetch items data from API
-  let items: any[] = [];
+  let items: ItemType[] = [];
+
   const token = await getAccessToken();
 
-  console.log("Items", token);
+  // console.log("Items", token);
+  // Fetch items data from API
   const data: any = await axios.get<ItemType[]>("http://localhost:3333/items", {
     headers: {
       Authorization: `Bearer ${token.accessToken}`,
     },
   });
   items = data.data;
+  // console.log("Items", items);
+
+  // Array to store promises for each API call
+  const fetchCategoryPromises: Promise<void>[] = [];
+
+  items.forEach((item) => {
+    // Push each API call promise into the array
+    fetchCategoryPromises.push(
+      axios
+        .get(`http://localhost:3333/categories/${item.categoryId}`)
+        .then((response) => {
+          item.category = response.data.name;
+          console.log("Category Name", item.category);
+        })
+        .catch((error) => {
+          console.error("Error fetching category:", error);
+        })
+    );
+  });
+
+  // Wait for all API calls to finish before logging items
+  await Promise.all(fetchCategoryPromises);
   console.log("Items", items);
-
-  // Function to handle item update onClick
-  const handleUpdate = (itemId: string) => {
-    // Handle update logic here, using itemId to identify the item to be updated
-    console.log("Updating item with ID:", itemId);
-  };
-
-  // Function to get category name by ID
-  const getCategoryName = async (categoryId: string) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3333/categories/${categoryId}`
-      );
-      return response.data.name; // Assuming the response contains the category name
-    } catch (error) {
-      console.error("Error fetching category name:", error);
-      return ""; // Return empty string if there's an error
-    }
-  };
 
   return (
     <>
@@ -88,7 +91,7 @@ const Items = async () => {
             <Link href="/items/add">
               <Button
                 variant="outline"
-                className="flex items-center px-4 py-2 bg-brand-blue text-white rounded-md"
+                className="flex items-center px-4 py-2 bg-brand-blue text-white rounded-md hover:underline"
               >
                 <MdAdd size={30} />
                 <span className="ml-2">Add Item</span>
@@ -127,7 +130,6 @@ const Items = async () => {
                               {item.description}
                             </TableCell>
                             <TableCell className="text-center">
-                              {/* Display category name */}
                               {item.category}
                             </TableCell>
                             <TableCell className="text-center">
