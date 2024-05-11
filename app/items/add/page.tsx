@@ -127,6 +127,9 @@ const AddItem = () => {
       });
     } catch (error) {
       console.error("Error adding item:", error);
+      toast.error("Error adding item", {
+        position: "top-right",
+      });
       // Handle errors, such as displaying an error message to the user
     }
   };
