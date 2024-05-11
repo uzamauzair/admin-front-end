@@ -160,7 +160,17 @@ const Items = async () => {
                                 className={buttonVariants({
                                   variant: "outline",
                                 })}
-                                href={`items/update/${item._id}`}
+                                href={{
+                                  pathname: `items/update/${item._id}`,
+                                  query: {
+                                    _id: item._id,
+                                    name: item.name,
+                                    description: item.description,
+                                    category: item.category,
+                                    images: item.images,
+                                    variants: JSON.stringify(item.variants),
+                                  },
+                                }}
                               >
                                 Update
                               </Link>
