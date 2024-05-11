@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./globals.css";
 
@@ -30,6 +32,7 @@ export default function RootLayout({
           )}
         >
           {children}
+          <ToastContainer />
         </body>
       </UserProvider>
     </html>

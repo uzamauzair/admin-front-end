@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import axios from "axios";
 import { z } from "zod";
+import { toast } from "react-toastify";
 
 type Category = {
   name: "";
@@ -120,6 +121,10 @@ const AddItem = () => {
       );
 
       console.log("Item added successfully:", response.data);
+      form.reset();
+      toast.success("Item Created Successfully", {
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error adding item:", error);
       // Handle errors, such as displaying an error message to the user
@@ -159,6 +164,7 @@ const AddItem = () => {
                             <FormLabel>Item Name</FormLabel>
                             <FormControl>
                               <Input
+                                required
                                 id="name"
                                 placeholder="Enter Name of the Item"
                                 {...field}
@@ -178,6 +184,7 @@ const AddItem = () => {
                             <FormLabel>Description</FormLabel>
                             <FormControl>
                               <Input
+                                required
                                 id="description"
                                 placeholder="Description of the Item"
                                 {...field}
@@ -197,6 +204,7 @@ const AddItem = () => {
                             <FormLabel>Item Image</FormLabel>
                             <FormControl>
                               <Input
+                                required
                                 placeholder="Image of the Item"
                                 type="file"
                                 {...fileRef}
