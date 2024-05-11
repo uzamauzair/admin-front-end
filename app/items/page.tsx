@@ -23,6 +23,7 @@ import axios from "axios"; // Import Axios for API calls
 import Image from "next/image";
 import { getAccessToken } from "@auth0/nextjs-auth0";
 import Head from "next/head";
+import DeleteClientComponent from "@/components/deleteClientComponent";
 
 type ItemType = {
   _id: string;
@@ -116,6 +117,7 @@ const Items = async () => {
                       <TableHead className="text-center">Medium</TableHead>
                       <TableHead className="text-center">Large</TableHead>
                       <TableHead className="text-center">Update</TableHead>
+                      <TableHead className="text-center">Delete</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -156,24 +158,26 @@ const Items = async () => {
                               {item.variants[2].quantity}
                             </TableCell>
                             <TableCell className="text-center">
-                              <Link
-                                className={buttonVariants({
-                                  variant: "outline",
-                                })}
-                                href={{
-                                  pathname: `items/update/${item._id}`,
-                                  query: {
-                                    _id: item._id,
-                                    name: item.name,
-                                    description: item.description,
-                                    category: item.category,
-                                    images: item.images,
-                                    variants: JSON.stringify(item.variants),
-                                  },
-                                }}
-                              >
-                                Update
-                              </Link>
+                              <Button className="bg-green-600 text-white px-4 py-2 rounded-md">
+                                <Link
+                                  href={{
+                                    pathname: `items/update/${item._id}`,
+                                    query: {
+                                      _id: item._id,
+                                      name: item.name,
+                                      description: item.description,
+                                      category: item.category,
+                                      images: item.images,
+                                      variants: JSON.stringify(item.variants),
+                                    },
+                                  }}
+                                >
+                                  Update
+                                </Link>
+                              </Button>
+                            </TableCell>
+                            <TableCell>
+                              <DeleteClientComponent id={item._id} />
                             </TableCell>
                           </TableRow>
                         );
